@@ -50,13 +50,27 @@ public class ProductService {
             repository.save(product);
 
             Map<String, String> map = new HashMap<>();
-            map.put("message", "your product: "+ dto.getName()+" has been updated successfully");
+            map.put("message", "your product: " + dto.getName() + " has been updated successfully");
             map.put("status", "200 OK");
             map.put("timestamp", LocalDateTime.now().toString());
             return map;
         }
-        throw new ProductNotFoundException("Product with the Id: "+ id+" is not available in the application");
+        throw new ProductNotFoundException("Product with the Id: " + id + " is not available in the application");
     }
+
+    public Map<String, String> deleteProduct(String name) {
+        boolean productAvailable = repository.existsByName(name);
+        if (productAvailable) {
+            repository.deleteByName(name);
+            Map<String, String> map = new HashMap<>();
+            map.put("message", "Product: " + name + " has been removed from the application");
+            map.put("status", "200 OK");
+            map.put("timestamp", LocalDateTime.now().toString());
+            return map;
+        }
+        throw new ProductNotFoundException("Product: " + name + " is not available in the application");
+    }
+
     private Product toEntity(ProductDto dto) {
         return Product.builder()
                 .name(dto.getName())
@@ -65,7 +79,7 @@ public class ProductService {
                 .build();
     }
 
-    private ProductDto toDto(Product product){
+    private ProductDto toDto(Product product) {
         return ProductDto.builder()
                 .id(product.getId())
                 .name(product.getName())

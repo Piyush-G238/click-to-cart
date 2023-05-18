@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -32,6 +33,11 @@ public class ProductRestController {
     @PutMapping("/{id}")
     public ResponseEntity<Map<String, String>> updateProduct(@PathVariable Long id, @Valid @RequestBody ProductDto dto) {
         Map<String, String> response = service.updateProduct(id, dto);
+        return ResponseEntity.ok(response);
+    }
+    @DeleteMapping("/{name}")
+    public ResponseEntity<Map<String, String>> deleteProductByName(@PathVariable String name) {
+        Map<String, String> response = service.deleteProduct(name);
         return ResponseEntity.ok(response);
     }
 }

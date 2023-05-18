@@ -51,6 +51,14 @@ class ProductServiceApplicationTests {
                         .status().isOk());
     }
 
+    @Test
+    public void test_deleteProductByName() throws Exception{
+        mockMvc
+                .perform(MockMvcRequestBuilders
+                        .delete("/api/v1/products/{name}", "Apple Mac Book Pro"))
+                .andExpect(MockMvcResultMatchers
+                        .status().isOk());
+    }
     private String toJSON() throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         ProductDto productDto = ProductDto.builder()
