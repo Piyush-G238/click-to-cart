@@ -23,8 +23,8 @@ public class ProductRestController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    @GetMapping
-    public ResponseEntity<ProductDto> getProductByName(@RequestParam(name = "name") String name){
+    @GetMapping("/{name}")
+    public ResponseEntity<ProductDto> getProductByName(@PathVariable String name){
         ProductDto response = service.getProductByName(name);
         return new ResponseEntity<>(response, HttpStatus.FOUND);
     }
@@ -32,6 +32,6 @@ public class ProductRestController {
     @PutMapping("/{id}")
     public ResponseEntity<Map<String, String>> updateProduct(@PathVariable Long id, @Valid @RequestBody ProductDto dto) {
         Map<String, String> response = service.updateProduct(id, dto);
-        return null;
+        return ResponseEntity.ok(response);
     }
 }

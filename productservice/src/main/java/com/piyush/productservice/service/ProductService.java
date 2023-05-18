@@ -41,7 +41,21 @@ public class ProductService {
     }
 
     public Map<String, String> updateProduct(Long id, ProductDto dto) {
-        return null;
+        boolean productAvailable = repository.existsById(id);
+        if (productAvailable) {
+            Product product = repository.findById(id).get();
+            product.setName(dto.getName());
+            product.setDescription(dto.getDescription());
+            product.setPrice(dto.getPrice());
+            repository.save(product);
+
+            Map<String, String> map = new HashMap<>();
+            map.put("message", "your product: "+ dto.getName()+" has been updated successfully");
+            map.put("status", "200 OK");
+            map.put("timestamp", LocalDateTime.now().toString());
+            return map;
+        }
+        throw new ProductNotFoundException("Product with the Id: "+ id+" is not available in the application");
     }
     private Product toEntity(ProductDto dto) {
         return Product.builder()

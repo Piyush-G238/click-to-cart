@@ -15,36 +15,48 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @AutoConfigureMockMvc
 class ProductServiceApplicationTests {
-	@Autowired
-	private MockMvc mockMvc;
+    @Autowired
+    private MockMvc mockMvc;
 
-	@Test
-	public void test_productCreate() throws Exception {
-		mockMvc
-				.perform(MockMvcRequestBuilders
-						.post("/api/v1/products")
-						.contentType(MediaType.APPLICATION_JSON)
-						.content(toJSON())
-				).andExpect(MockMvcResultMatchers
-						.status()
-						.isCreated());
-	}
+    @Test
+    public void test_productCreate() throws Exception {
+        mockMvc
+                .perform(MockMvcRequestBuilders
+                        .post("/api/v1/products")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(toJSON())
+                ).andExpect(MockMvcResultMatchers
+                        .status()
+                        .isCreated());
+    }
 
-	@Test
-	public void test_getProductByName() throws Exception {
-		mockMvc
-				.perform(MockMvcRequestBuilders
-						.get("/api/v1/products")
-						.param("name","Apple Mac Book")
-				).andExpect(MockMvcResultMatchers
-						.jsonPath("$.description").value("One of best products by apple"));
-	}
-	private String toJSON() throws JsonProcessingException {
-		ObjectMapper mapper = new ObjectMapper();
-		ProductDto productDto = ProductDto.builder()
-				.name("Apple Mac Book")
-				.description("One of best products by apple")
-				.price(88000.0).build();
-		return mapper.writeValueAsString(productDto);
-	}
+    @Test
+    public void test_getProductByName() throws Exception {
+        mockMvc
+                .perform(MockMvcRequestBuilders
+                                .get("/api/v1/products/{name}", "Apple Mac Book")
+                        //.param("name","Apple Mac Book")
+                ).andExpect(MockMvcResultMatchers
+                        .jsonPath("$.description").value("One of best products by apple"));
+    }
+
+    @Test
+    public void test_updateProduct() throws Exception {
+        mockMvc
+                .perform(MockMvcRequestBuilders
+                        .put("/api/v1/products/{id}", 2)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(toJSON())
+                ).andExpect(MockMvcResultMatchers
+                        .status().isOk());
+    }
+
+    private String toJSON() throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        ProductDto productDto = ProductDto.builder()
+                .name("Apple Mac Book Pro")
+                .description("Upgraded version of Mac book")
+                .price(97000.0).build();
+        return mapper.writeValueAsString(productDto);
+    }
 }
