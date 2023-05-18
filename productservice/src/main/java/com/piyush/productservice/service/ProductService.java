@@ -1,0 +1,62 @@
+package com.piyush.productservice.service;
+
+import com.piyush.productservice.dto.ProductDto;
+import com.piyush.productservice.exception.ProductNotFoundException;
+import com.piyush.productservice.model.Product;
+import com.piyush.productservice.repository.ProductRepository;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+
+@Service
+@Slf4j
+public class ProductService {
+    @Autowired
+    private ProductRepository repository;
+
+    public Map<String, String> createProduct(ProductDto productDto) {
+        boolean productAvailable = repository.existsByName(productDto.getName());
+        if (!productAvailable) {
+            Product product = toEntity(productDto);
+            repository.save(product);
+            log.info("product is successfully added in the application. ProductId: " + product.getId());
+            Map<String, String> map = new HashMap<>();
+            map.put("message", "Product " + product.getName() + "has been added to application. ProductId: " + product.getId());
+            map.put("status", "201 CREATED");
+            map.put("timestamp", LocalDateTime.now().toString());
+            return map;
+        }
+        throw new DataIntegrityViolationException("Product " + productDto.getName() + " already exists in the application");
+    }
+
+    public ProductDto getProductByName(String name) {
+        Product product = repository.getProductByName(name)
+                .orElseThrow(() -> new ProductNotFoundException("Product: " + name + " does not exists in application"));
+        return toDto(product);
+    }
+
+    public Map<String, String> updateProduct(Long id, ProductDto dto) {
+        return null;
+    }
+    private Product toEntity(ProductDto dto) {
+        return Product.builder()
+                .name(dto.getName())
+                .description(dto.getDescription())
+                .price(dto.getPrice())
+                .build();
+    }
+
+    private ProductDto toDto(Product product){
+        return ProductDto.builder()
+                .id(product.getId())
+                .name(product.getName())
+                .description(product.getDescription())
+                .price(product.getPrice())
+                .build();
+    }
+}

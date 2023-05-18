@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5433/shoppingdb
+    username: postgres
+    password: admin@123
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl:auto: update
+      database: postgresql
+      database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
