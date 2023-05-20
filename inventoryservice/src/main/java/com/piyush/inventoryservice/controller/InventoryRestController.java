@@ -8,7 +8,6 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,5 +28,11 @@ public class InventoryRestController {
     public ResponseEntity<List<InventoryDto>> listAllInventory(@RequestParam(name = "pageNo", defaultValue = "0") int pageNo, @RequestParam(name = "pageSize", defaultValue = "5") int pageSize) {
         List<InventoryDto> inventoryDtos = service.listAllInventories(pageNo, pageSize);
         return new ResponseEntity<>(inventoryDtos, HttpStatus.FOUND);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Map<String, String>> deleteInventory(@PathVariable Long id) {
+        Map<String, String> response = service.deleteInventory(id);
+        return ResponseEntity.ok(response);
     }
 }

@@ -1,6 +1,7 @@
 package com.piyush.inventoryservice.services;
 
 import com.piyush.inventoryservice.dto.InventoryDto;
+import com.piyush.inventoryservice.exception.InventoryNotFoundException;
 import com.piyush.inventoryservice.exception.ProductNotFoundException;
 import com.piyush.inventoryservice.model.Inventory;
 import com.piyush.inventoryservice.repository.InventoryRepository;
@@ -27,17 +28,17 @@ public class InventoryService {
     private RestTemplate restTemplate;
 
     public Map<String, String> createInventory(InventoryDto dto) {
-        Boolean productAvailable = restTemplate.getForObject("http://localhost:8080/api/v1/products/id/{productId}", Boolean.class,dto.getProductId());
+        Boolean productAvailable = restTemplate.getForObject("http://localhost:8080/api/v1/products/id/{productId}", Boolean.class, dto.getProductId());
         if (productAvailable) {
             boolean inventoryAvailable = repository.existsByProductId(dto.getProductId());
-            if (!inventoryAvailable){
-                Inventory inventory =toEntity(dto);
+            if (!inventoryAvailable) {
+                Inventory inventory = toEntity(dto);
                 repository.save(inventory);
-                return createResponse("Inventory for productId: "+dto.getProductId()+" has been created successfully", "201 CREATED");
+                return createResponse("Inventory for productId: " + dto.getProductId() + " has been created successfully", "201 CREATED");
             }
-            throw new DataIntegrityViolationException("Inventory for productId: "+dto.getProductId()+" already exists.");
+            throw new DataIntegrityViolationException("Inventory for productId: " + dto.getProductId() + " already exists.");
         }
-        throw new ProductNotFoundException("ProductId: "+ dto.getProductId()+" is not available in application");
+        throw new ProductNotFoundException("ProductId: " + dto.getProductId() + " is not available in application");
     }
 
     private Inventory toEntity(InventoryDto dto) {
@@ -56,6 +57,7 @@ public class InventoryService {
                 .productId(inventory.getProductId())
                 .build();
     }
+
     private Map<String, String> createResponse(String message, String status) {
         Map<String, String> map = new HashMap<>();
         map.put("message", message);
@@ -68,5 +70,14 @@ public class InventoryService {
         Pageable pageable = PageRequest.of(pageNo, pageSize);
         List<Inventory> inventoryList = repository.findAll(pageable).toList();
         return inventoryList.stream().map(this::toDto).collect(Collectors.toList());
+    }
+
+    public Map<String, String> deleteInventory(Long id) throws InventoryNotFoundException {
+        boolean inventoryAvailable = repository.existsById(id);
+        if (inventoryAvailable) {
+            repository.deleteById(id);
+            return createResponse("Inventory with ID: " + id + " has been removed from application", "200 OK");
+        }
+        throw new InventoryNotFoundException("Inventory with ID: " + id + " is not there in the application");
     }
 }

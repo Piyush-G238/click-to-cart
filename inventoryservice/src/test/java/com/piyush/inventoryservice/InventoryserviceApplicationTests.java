@@ -40,6 +40,16 @@ class InventoryserviceApplicationTests {
 						.jsonPath("$[0].quantity")
 						.value(3L));
 	}
+
+	@Test
+	public void test_deleteInventory() throws Exception {
+		mockMvc
+				.perform(MockMvcRequestBuilders
+						.delete("/api/v1/inventories/{id}", 1L)
+				).andExpect(MockMvcResultMatchers
+						.status().isOk());
+	}
+
 	private String toJSON() throws JsonProcessingException {
 		ObjectMapper mapper = new ObjectMapper();
 		InventoryDto inventoryDto = InventoryDto.builder()
