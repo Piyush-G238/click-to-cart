@@ -6,12 +6,16 @@ import com.piyush.inventoryservice.model.Inventory;
 import com.piyush.inventoryservice.repository.InventoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class InventoryService {
@@ -44,11 +48,25 @@ public class InventoryService {
                 .build();
     }
 
+    private InventoryDto toDto(Inventory inventory) {
+        return InventoryDto.builder()
+                .id(inventory.getId())
+                .name(inventory.getName())
+                .quantity(inventory.getQuantity())
+                .productId(inventory.getProductId())
+                .build();
+    }
     private Map<String, String> createResponse(String message, String status) {
         Map<String, String> map = new HashMap<>();
         map.put("message", message);
         map.put("status", status);
         map.put("timestamp", LocalDateTime.now().toString());
         return map;
+    }
+
+    public List<InventoryDto> listAllInventories(int pageNo, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        List<Inventory> inventoryList = repository.findAll(pageable).toList();
+        return inventoryList.stream().map(this::toDto).collect(Collectors.toList());
     }
 }

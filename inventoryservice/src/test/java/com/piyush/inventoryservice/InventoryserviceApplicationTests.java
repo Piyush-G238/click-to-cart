@@ -31,6 +31,15 @@ class InventoryserviceApplicationTests {
 						.isCreated());
 	}
 
+	@Test
+	public void test_getAllInventory() throws Exception {
+		mockMvc
+				.perform(MockMvcRequestBuilders
+						.get("/api/v1/inventories")
+				).andExpect(MockMvcResultMatchers
+						.jsonPath("$[0].quantity")
+						.value(3L));
+	}
 	private String toJSON() throws JsonProcessingException {
 		ObjectMapper mapper = new ObjectMapper();
 		InventoryDto inventoryDto = InventoryDto.builder()
