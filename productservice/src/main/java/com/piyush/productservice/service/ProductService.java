@@ -87,4 +87,8 @@ public class ProductService {
                 .price(product.getPrice())
                 .build();
     }
+
+    public Boolean checkForProductById(Long productId) {
+        return repository.existsById(productId);
+    }
 }

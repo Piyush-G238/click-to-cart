@@ -40,4 +40,9 @@ public class ProductRestController {
         Map<String, String> response = service.deleteProduct(name);
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/id/{productId}")
+    public ResponseEntity<Boolean> checkForProductById(@PathVariable Long productId) {
+        return ResponseEntity.ok(service.checkForProductById(productId));
+    }
 }
