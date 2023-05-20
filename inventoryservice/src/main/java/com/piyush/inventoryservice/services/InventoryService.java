@@ -80,4 +80,12 @@ public class InventoryService {
         }
         throw new InventoryNotFoundException("Inventory with ID: " + id + " is not there in the application");
     }
+
+    public void updateInventoryByProductId(Long productId, Long qty) {
+        Inventory inventory = repository
+                .findByProductId(productId)
+                .orElseThrow(() -> new InventoryNotFoundException("There is no product with ID: " + productId + " in inventory"));
+        inventory.setQuantity(qty);
+        repository.save(inventory);
+    }
 }

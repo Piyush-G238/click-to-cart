@@ -35,4 +35,9 @@ public class InventoryRestController {
         Map<String, String> response = service.deleteInventory(id);
         return ResponseEntity.ok(response);
     }
+
+    @PutMapping("/{productId}")
+    public void updateInventoryByProductId(@PathVariable Long productId,@RequestBody Map<String, Long> req){
+        service.updateInventoryByProductId(productId, req.get("qty"));
+    }
 }
