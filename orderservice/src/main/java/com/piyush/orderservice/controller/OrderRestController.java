@@ -25,4 +25,9 @@ public class OrderRestController {
     public ResponseEntity<OrderDto> getOrderById(@PathVariable Long id) {
         return ResponseEntity.ok(service.getOrderById(id));
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Map<String, String>> deleteOrderById(@PathVariable Long id) {
+        return ResponseEntity.ok(service.deleteOrderById(id));
+    }
 }

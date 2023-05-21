@@ -57,6 +57,12 @@ public class OrderService {
         }
     }
 
+    public Map<String, String> deleteOrderById(Long id){
+        Order order = repository.findById(id).orElseThrow(() -> new RuntimeException(""));
+        repository.delete(order);
+        return createResponse("Your Order has been cancelled successfully", "200 OK");
+    }
+
     private Double calculateOrderPrice(Set<OrderItem> orderItems) {
         Double price = 0.0;
         for (OrderItem item: orderItems) {

@@ -42,6 +42,15 @@ class OrderserviceApplicationTests {
 				).andExpect(MockMvcResultMatchers
 						.status().isOk());
 	}
+
+	@Test
+	void test_deleteOrderById() throws Exception {
+		mockMvc
+				.perform(MockMvcRequestBuilders
+						.delete("/api/v1/orders/{id}", 1L)).andExpect(MockMvcResultMatchers
+						.status().isOk());
+	}
+
 	private String toJSONObject() throws JsonProcessingException {
 		ObjectMapper mapper = new ObjectMapper();
 		OrderItemDto itemDto1 = OrderItemDto
