@@ -28,3 +28,9 @@ management:
   tracing:
     sampling:
       probability: 1.0
+okta:
+  oauth2:
+    issuer: https://dev-02009464.okta.com/oauth2/default
+    client-id: 0oa9nah80n4ds7NZ85d7
+    client-secret: SsaufzfudAFduzPx6S-fK5d9EAz-Oa2R_8d2osJg
+    audience: api://default
