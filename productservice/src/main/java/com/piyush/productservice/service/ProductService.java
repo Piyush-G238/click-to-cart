@@ -34,9 +34,9 @@ public class ProductService {
         throw new DataIntegrityViolationException("Product " + productDto.getName() + " already exists in the application");
     }
 
-    public ProductDto getProductByName(String name) {
-        Product product = repository.getProductByName(name)
-                .orElseThrow(() -> new ProductNotFoundException("Product: " + name + " does not exists in application"));
+    public ProductDto getProductById(Long id) {
+        Product product = repository.findById(id)
+                .orElseThrow(() -> new ProductNotFoundException("Product having ID: " + id + " does not exists in application"));
         return toDto(product);
     }
 

@@ -24,10 +24,10 @@ public class ProductRestController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    @GetMapping("/{name}")
-    public ResponseEntity<ProductDto> getProductByName(@PathVariable String name){
-        ProductDto response = service.getProductByName(name);
-        return new ResponseEntity<>(response, HttpStatus.FOUND);
+    @GetMapping("/{id}")
+    public ResponseEntity<ProductDto> getProductById(@PathVariable Long id){
+        ProductDto response = service.getProductById(id);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
