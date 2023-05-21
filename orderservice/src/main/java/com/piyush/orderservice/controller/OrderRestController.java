@@ -4,7 +4,6 @@ import com.piyush.orderservice.dto.OrderDto;
 import com.piyush.orderservice.service.OrderService;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
-import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -24,7 +23,6 @@ public class OrderRestController {
 
     @PostMapping
     @CircuitBreaker(name = "inventory", fallbackMethod = "serviceUnavailableHandler")
-    @TimeLimiter(name = "inventory", fallbackMethod = "timeoutHandler")
     @Retry(name = "inventory", fallbackMethod = "serviceUnavailableHandler")
     public ResponseEntity<Map<String, String>> createOrder(@RequestBody OrderDto dto) {
         Map<String, String> res = service.createOrder(dto);
@@ -46,13 +44,5 @@ public class OrderRestController {
         response.put("status", "503 SERVICE_UNAVAILABLE");
         response.put("timestamp", LocalDateTime.now().toString());
         return new ResponseEntity<>(response, HttpStatus.SERVICE_UNAVAILABLE);
-    }
-
-    public ResponseEntity<Map<String, String>> timeoutHandler(RuntimeException exception) {
-        Map<String, String> response = new HashMap<>();
-        response.put("message","Server is taking more time than expected. Please try again later.");
-        response.put("status", "408 REQUEST_TIMEOUT");
-        response.put("timestamp", LocalDateTime.now().toString());
-        return new ResponseEntity<>(response, HttpStatus.REQUEST_TIMEOUT);
     }
 }

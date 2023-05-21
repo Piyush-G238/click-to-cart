@@ -29,6 +29,9 @@ management:
   endpoint:
     health:
       show-details: always
+  tracing:
+    sampling:
+      probability: 1.0
 resilience4j:
   circuitbreaker:
     instances:
@@ -41,10 +44,6 @@ resilience4j:
         waitDurationInOpenState: 5s
         permittedNumberOfCallsInHalfOpenState: 3
         automaticTransitionFromOpenToHalfOpenEnabled: true
-  timelimiter:
-    instances:
-      inventory:
-        timeout-duration: 4s
   retry:
     instances:
       inventory:
