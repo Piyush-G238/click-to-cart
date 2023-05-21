@@ -28,7 +28,7 @@ public class InventoryService {
     private RestTemplate restTemplate;
 
     public Map<String, String> createInventory(InventoryDto dto) {
-        Boolean productAvailable = restTemplate.getForObject("http://localhost:8080/api/v1/products/id/{productId}", Boolean.class, dto.getProductId());
+        Boolean productAvailable = restTemplate.getForObject("http://product-service/api/v1/products/id/{productId}", Boolean.class, dto.getProductId());
         if (productAvailable) {
             boolean inventoryAvailable = repository.existsByProductId(dto.getProductId());
             if (!inventoryAvailable) {
