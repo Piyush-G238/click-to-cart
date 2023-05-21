@@ -14,6 +14,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -42,6 +43,10 @@ public class OrderService {
         return null;
     }
 
+    public OrderDto getOrderById(Long id) {
+        Order order = repository.findById(id).orElseThrow();
+        return toOrderDto(order);
+    }
     private void updateInventory(Set<OrderItem> orderItems) {
         for (OrderItem itm:orderItems) {
             ResponseEntity<InventoryDto> response = template.getForEntity("http://inventory-service/api/v1/inventories/{productId}", InventoryDto.class, itm.getProductId());
@@ -92,6 +97,26 @@ public class OrderService {
         return OrderItem.builder()
                 .productId(itemDto.getProductId())
                 .quantity(itemDto.getQuantity())
+                .build();
+    }
+
+    public OrderDto toOrderDto(Order order) {
+        return OrderDto.builder()
+                .id(order.getId())
+                .orderItems(order
+                        .getOrderedItems()
+                        .stream()
+                        .map(this::toItemDto)
+                        .collect(Collectors.toSet()))
+                .price(order.getPrice())
+                .build();
+    }
+
+    public OrderItemDto toItemDto(OrderItem orderItem) {
+        return OrderItemDto.builder()
+                .id(orderItem.getId())
+                .productId(orderItem.getProductId())
+                .quantity(orderItem.getQuantity())
                 .build();
     }
 

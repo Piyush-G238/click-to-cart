@@ -34,6 +34,14 @@ class OrderserviceApplicationTests {
 						.isCreated());
 	}
 
+	@Test
+	void test_getOrderById() throws Exception {
+		mockMvc
+				.perform(MockMvcRequestBuilders
+						.get("/api/v1/orders/{id}", 1L)
+				).andExpect(MockMvcResultMatchers
+						.status().isOk());
+	}
 	private String toJSONObject() throws JsonProcessingException {
 		ObjectMapper mapper = new ObjectMapper();
 		OrderItemDto itemDto1 = OrderItemDto
