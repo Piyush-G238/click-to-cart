@@ -88,4 +88,11 @@ public class InventoryService {
         inventory.setQuantity(qty);
         repository.save(inventory);
     }
+
+    public InventoryDto getInventoryByProductId(Long productId) {
+        Inventory inventory = repository
+                .findByProductId(productId)
+                .orElseThrow(() -> new InventoryNotFoundException("There is no product with ID: " + productId + " in inventory"));
+        return toDto(inventory);
+    }
 }

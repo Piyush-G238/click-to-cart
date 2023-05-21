@@ -30,6 +30,11 @@ public class InventoryRestController {
         return new ResponseEntity<>(inventoryDtos, HttpStatus.FOUND);
     }
 
+    @GetMapping("/{productId}")
+    public ResponseEntity<InventoryDto> getInventoryByProductId(@PathVariable Long productId) {
+        InventoryDto dto = service.getInventoryByProductId(productId);
+        return new ResponseEntity<>(dto, HttpStatusCode.valueOf(200));
+    }
     @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, String>> deleteInventory(@PathVariable Long id) {
         Map<String, String> response = service.deleteInventory(id);
