@@ -2,12 +2,16 @@ package com.piyush.inventoryservice.controller;
 
 import com.piyush.inventoryservice.dto.InventoryDto;
 import com.piyush.inventoryservice.services.InventoryService;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,6 +23,8 @@ public class InventoryRestController {
     private InventoryService service;
 
     @PostMapping
+    @CircuitBreaker(name = "product", fallbackMethod = "serviceUnavailableHandler")
+    @Retry(name = "product", fallbackMethod = "serviceUnavailableHandler")
     public ResponseEntity<Map<String, String>> createInventory(@RequestBody InventoryDto dto) {
         Map<String, String> response = service.createInventory(dto);
         return new ResponseEntity<>(response, HttpStatusCode.valueOf(201));
@@ -44,5 +50,13 @@ public class InventoryRestController {
     @PutMapping("/{productId}")
     public void updateInventoryByProductId(@PathVariable Long productId,@RequestBody Map<String, Long> req){
         service.updateInventoryByProductId(productId, req.get("qty"));
+    }
+
+    public ResponseEntity<Map<String, String>> serviceUnavailableHandler(RuntimeException exception) {
+        Map<String, String> response = new HashMap<>();
+        response.put("message","There is some technical issue with the server. Please try again later.");
+        response.put("status", "503 SERVICE_UNAVAILABLE");
+        response.put("timestamp", LocalDateTime.now().toString());
+        return new ResponseEntity<>(response, HttpStatus.SERVICE_UNAVAILABLE);
     }
 }

@@ -4,6 +4,7 @@ import com.piyush.orderservice.dto.InventoryDto;
 import com.piyush.orderservice.dto.OrderDto;
 import com.piyush.orderservice.dto.OrderItemDto;
 import com.piyush.orderservice.dto.ProductDto;
+import com.piyush.orderservice.exception.OrderNotFoundException;
 import com.piyush.orderservice.model.Order;
 import com.piyush.orderservice.model.OrderItem;
 import com.piyush.orderservice.repository.OrderRepository;
@@ -26,7 +27,7 @@ public class OrderService {
     private OrderRepository repository;
 
     @Autowired
-    private RestTemplate template;
+    private RestTemplate restTemplate;
 
     public Map<String, String> createOrder(OrderDto orderDto) {
         Order order = toOrderEntity(orderDto);
@@ -44,21 +45,21 @@ public class OrderService {
     }
 
     public OrderDto getOrderById(Long id) {
-        Order order = repository.findById(id).orElseThrow();
+        Order order = repository.findById(id).orElseThrow(() -> new OrderNotFoundException(("Order having ID: "+ id +" is not available in application.")));
         return toOrderDto(order);
     }
     private void updateInventory(Set<OrderItem> orderItems) {
         for (OrderItem itm:orderItems) {
-            ResponseEntity<InventoryDto> response = template.getForEntity("http://inventory-service/api/v1/inventories/{productId}", InventoryDto.class, itm.getProductId());
+            ResponseEntity<InventoryDto> response = restTemplate.getForEntity("http://inventory-service/api/v1/inventories/{productId}", InventoryDto.class, itm.getProductId());
             InventoryDto dto = response.getBody();
             assert dto != null;
             Map<String, Long> map = Map.of("qty", (dto.getQuantity()- itm.getQuantity()));
-            template.put("http://inventory-service/api/v1/inventories/{productId}", map, itm.getProductId());
+            restTemplate.put("http://inventory-service/api/v1/inventories/{productId}", map, itm.getProductId());
         }
     }
 
     public Map<String, String> deleteOrderById(Long id){
-        Order order = repository.findById(id).orElseThrow(() -> new RuntimeException(""));
+        Order order = repository.findById(id).orElseThrow(() -> new OrderNotFoundException(("Order having ID: "+ id +" is not available in application.")));
         repository.delete(order);
         return createResponse("Your Order has been cancelled successfully", "200 OK");
     }
@@ -66,7 +67,7 @@ public class OrderService {
     private Double calculateOrderPrice(Set<OrderItem> orderItems) {
         Double price = 0.0;
         for (OrderItem item: orderItems) {
-            ResponseEntity<ProductDto> response = template.getForEntity("http://product-service/api/v1/products/{id}", ProductDto.class, item.getProductId());
+            ResponseEntity<ProductDto> response = restTemplate.getForEntity("http://product-service/api/v1/products/{id}", ProductDto.class, item.getProductId());
             ProductDto dto = response.getBody();
             assert dto != null;
             price += (item.getQuantity() * dto.getPrice());
@@ -76,7 +77,7 @@ public class OrderService {
 
     private boolean validateOrder(Set<OrderItem> orderedItems) {
         for (OrderItem item: orderedItems) {
-            ResponseEntity<InventoryDto> response = template.getForEntity("http://inventory-service/api/v1/inventories/{productId}", InventoryDto.class, item.getProductId());
+            ResponseEntity<InventoryDto> response = restTemplate.getForEntity("http://inventory-service/api/v1/inventories/{productId}", InventoryDto.class, item.getProductId());
             if (response.getStatusCode().is4xxClientError()){
                 throw new RuntimeException("Product having ID: "+ item.getProductId()+" is not available in application");
             }

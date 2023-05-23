@@ -12,6 +12,22 @@ spring:
       database: postgresql
       database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://dev-02009464.okta.com/oauth2/default
+      client:
+        registration:
+          okta:
+            provider: okta
+            authorization-grant-type: client_credentials
+            scope: app_scope
+            client-id: 0oa9nah80n4ds7NZ85d7
+            client-secret: SsaufzfudAFduzPx6S-fK5d9EAz-Oa2R_8d2osJg
+        provider:
+          okta:
+            issuer-uri: https://dev-02009464.okta.com/oauth2/default
 server:
   port: 8081
 eureka:
@@ -22,3 +38,24 @@ management:
   tracing:
     sampling:
       probability: 1.0
+okta:
+  oauth2:
+    issuer: https://dev-02009464.okta.com/oauth2/default
+    audience: api://default
+resilience4j:
+  circuitbreaker:
+    instances:
+      product:
+        registerHealthIndicator: true
+        event-consumer-buffer-size: 10
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 5s
+        permittedNumberOfCallsInHalfOpenState: 3
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+  retry:
+    instances:
+      product:
+        max-attempts: 3
+        wait-duration: 5s
